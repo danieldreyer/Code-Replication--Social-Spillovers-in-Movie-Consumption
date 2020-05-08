@@ -1,0 +1,15 @@
+	(1)	(2)	(3)	(4)	(5)	(6)	(7)
+VARIABLES	tickets_p33_lowbudget_wk1d_r	tickets_p33_lowbudget_wk2d_r	tickets_p33_lowbudget_wk3d_r	tickets_p33_lowbudget_wk4d_r	tickets_p33_lowbudget_wk5d_r	tickets_p33_lowbudget_wk6d_r	tickets_p33_lowbudget_wkn1d_r
+							
+open_res_own_mat5_95_6	3.762***						
+	(0.690)						
+tickets_p33_lowbudget_wk1d_r		0.368***	0.285***	0.140***	0.0563**	0.0323**	0.881***
+		(0.0606)	(0.0460)	(0.0283)	(0.0251)	(0.0164)	(0.151)
+Constant	-0.00219	-1.91e-10	1.01e-10	3.43e-05	-6.55e-11	0	-0.000266
+	(0.0161)	(0.00494)	(0.00391)	(0.00279)	(0.00222)	(0.00177)	(0.0127)
+							
+Observations	705	705	705	704	705	705	704
+R-squared	0.058	0.639	0.528	0.364	0.214	0.110	0.572
+F-stat	29.70						
+Robust standard errors in parentheses							
+*** p<0.01, ** p<0.05, * p<0.1							

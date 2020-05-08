@@ -1,0 +1,15 @@
+	(1)
+VARIABLES	tickets_wk1d_r
+	
+theaterso	0.000131***
+	(1.05e-05)
+open_res_own_mat5_75_0	-2.728***
+	(0.470)
+Constant	-0.852***
+	(0.0739)
+	
+Observations	1,671
+R-squared	0.102
+F-stat	33.74
+Robust standard errors in parentheses	
+*** p<0.01, ** p<0.05, * p<0.1	

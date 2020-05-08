@@ -1,0 +1,15 @@
+	(1)	(2)	(3)	(4)	(5)	(6)	(7)
+VARIABLES	tickets_p33_lr1000_wk1d_r	tickets_p33_lr1000_wk2d_r	tickets_p33_lr1000_wk3d_r	tickets_p33_lr1000_wk4d_r	tickets_p33_lr1000_wk5d_r	tickets_p33_lr1000_wk6d_r	tickets_p33_lr1000_wkn1d_r
+							
+open_res_own_mat5_55_0	-1.787***						
+	(0.466)						
+tickets_p33_lr1000_wk1d_r		0.587***	0.317***	0.169***	0.0878***	0.0568***	1.217***
+		(0.0871)	(0.0651)	(0.0460)	(0.0281)	(0.0182)	(0.214)
+Constant	-0.000920	-6.76e-10	-1.68e-10	-1.17e-10	0	-8.42e-11	-1.53e-09
+	(0.0181)	(0.00564)	(0.00411)	(0.00282)	(0.00196)	(0.00123)	(0.0135)
+							
+Observations	825	825	825	825	825	825	825
+R-squared	0.016	0.559	0.417	0.423	0.313	0.268	0.533
+F-stat	14.68						
+Robust standard errors in parentheses							
+*** p<0.01, ** p<0.05, * p<0.1							

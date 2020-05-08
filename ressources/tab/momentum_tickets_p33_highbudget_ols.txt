@@ -1,0 +1,12 @@
+	(1)	(2)	(3)	(4)	(5)	(6)
+VARIABLES	tickets_p33_highbudget_wk2d_r	tickets_p33_highbudget_wk3d_r	tickets_p33_highbudget_wk4d_r	tickets_p33_highbudget_wk5d_r	tickets_p33_highbudget_wk6d_r	tickets_p33_highbudget_wkn1d_r
+						
+tickets_p33_highbudget_wk1d_r	0.358***	0.192***	0.117***	0.0746***	0.0536***	0.795***
+	(0.0269)	(0.0171)	(0.0119)	(0.00883)	(0.00666)	(0.0676)
+Constant	4.75e-10	2.02e-10	3.57e-10	1.12e-10	1.38e-10	3.12e-09
+	(0.0116)	(0.00902)	(0.00636)	(0.00490)	(0.00401)	(0.0310)
+						
+Observations	744	744	744	744	744	744
+R-squared	0.603	0.419	0.350	0.269	0.221	0.510
+Robust standard errors in parentheses						
+*** p<0.01, ** p<0.05, * p<0.1						

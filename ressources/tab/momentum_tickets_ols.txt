@@ -1,0 +1,12 @@
+	(1)	(2)	(3)	(4)	(5)	(6)	(7)
+VARIABLES	tickets_wk1d_r	tickets_wk2d_r	tickets_wk3d_r	tickets_wk4d_r	tickets_wk5d_r	tickets_wk6d_r	tickets_wkn1d_r
+							
+tickets_wk1d_r	1	0.423***	0.235***	0.140***	0.0888***	0.0630***	0.950***
+	(0)	(0.00755)	(0.00578)	(0.00459)	(0.00331)	(0.00258)	(0.0202)
+Constant	0	-2.66e-10	-1.77e-10	8.92e-11	0	-5.56e-11	-2.21e-09
+	(0)	(0.00861)	(0.00659)	(0.00523)	(0.00377)	(0.00294)	(0.0230)
+							
+Observations	1,671	1,671	1,671	1,671	1,671	1,671	1,671
+R-squared	1.000	0.653	0.498	0.357	0.301	0.264	0.570
+Standard errors in parentheses							
+*** p<0.01, ** p<0.05, * p<0.1							

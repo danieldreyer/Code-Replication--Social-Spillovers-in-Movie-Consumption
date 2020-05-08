@@ -1,0 +1,13 @@
+	(1)
+VARIABLES	tickets_wk1d_r
+	
+open_res_own_mat5_75_0	-3.041***
+	(0.488)
+Constant	0.000810
+	(0.0277)
+	
+Observations	1,671
+R-squared	0.018
+F-stat	38.80
+Robust standard errors in parentheses	
+*** p<0.01, ** p<0.05, * p<0.1	

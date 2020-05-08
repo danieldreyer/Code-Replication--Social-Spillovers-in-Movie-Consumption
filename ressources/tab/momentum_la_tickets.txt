@@ -1,0 +1,13 @@
+	(1)
+VARIABLES	tickets_wk1d_r
+	
+open_res_own_mat_la_cens_6	0.00449***
+	(0.000824)
+Constant	-0.000998
+	(0.0276)
+	
+Observations	1,671
+R-squared	0.022
+F-stat	29.74
+Robust standard errors in parentheses	
+*** p<0.01, ** p<0.05, * p<0.1	
