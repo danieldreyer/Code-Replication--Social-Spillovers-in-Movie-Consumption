@@ -1,0 +1,362 @@
+```{r}
+# SET WD
+setwd("X:/libraries/seminar_ss20/Social-Spillover-Code-replication")
+```
+
+```{r, warning=FALSE}
+# PACKAGES
+library(foreign)
+library(dplyr)
+library(readstata13)
+library(mosaic) # zscores
+library(ggplot2)
+library(estimatr) 
+```
+
+```{r}
+#IMPORT DATA
+films_day <- read.dta13("./data/res_dat/films_day.dta")
+holidays <- read.dta13("./data/res_dat/holidays.dta")
+weather_collapsed_all <- read.dta13("./data/res_dat/weather_collapsed_all.dta")
+weather_collapsed_day <- read.dta13("./data/res_dat/weather_collapsed_day.dta")
+```
+
+
+```{r}
+# FIGURE 1-PANEL A
+
+films_temp <- films_day %>% 
+    select(tickets, theaters, dow, wk1, wk2, wk3, wk4, wk5, wk6, id2, wkintheaters, opening_sat_date, date)
+
+dat_plot1_panelA <- films_temp %>% 
+    group_by(id2, wkintheaters) %>% 
+    mutate(wktick= mean(tickets, na.rm=TRUE),
+           wktheaters= mean(theaters, na.rm=TRUE),
+           wktickh = 1000000*tickets/theaters) %>% 
+    ungroup() %>% 
+    group_by(wkintheaters) %>% 
+    summarise_all(mean)
+
+plot1_panelA <- ggplot(dat_plot1_panelA, aes(x=wkintheaters)) +
+    geom_line(aes(y=wktick, color="Audience")) + 
+    geom_point(aes(y=wktick, color="Audience")) + 
+    geom_line(aes(y=wktickh/300, color="Audience per Screen"), linetype="dashed") +
+    geom_point(aes(y=wktickh/300, color="Audience per Screen")) +
+    scale_x_continuous(name="Week in Theatre", breaks=c(1:6)) +
+    scale_y_continuous(name = "Average Daily Audience (1.000.000s)", breaks = seq(0.2,1,0.2),
+                       sec.axis = sec_axis(~ . *300, name="Average Daily Audience per Screen", breaks = seq(50,400,50))) +
+    scale_color_manual(name="",values = c("blue","red")) + 
+    theme_bw() +
+    theme(legend.position="bottom", plot.title = element_text(hjust = 0.5)) +
+    labs(title="A. by Movie")
+```
+
+
+
+```{r}
+# FIGURE 1-PANEL B
+dat_plot1_panelB <- films_temp %>% 
+    group_by(opening_sat_date, date) %>% 
+      summarise(tickets = sum(tickets), theaters = sum(theaters),
+             mean(dow),
+             mean(wk1),
+             mean(wk2),
+             mean(wk3),
+             mean(wk4),
+             mean(wk5),
+             mean(wk6),
+             wkintheaters = mean(wkintheaters)) %>% 
+    group_by(wkintheaters) %>% 
+      mutate(wktick = mean(tickets),
+             wktheaters = mean(theaters))  %>% 
+      mutate(wktickth = 1000000*wktick/wktheaters) %>% 
+    group_by(wkintheaters) %>% 
+      summarise_all(mean) %>% 
+    select(wkintheaters, wktick, wktheaters, wktickth)
+  
+
+plot1_panelB <- ggplot(dat_plot1_panelB, aes(x=wkintheaters)) +
+    geom_line(aes(y=wktick, color="Audience")) + 
+    geom_point(aes(y=wktick, color="Audience")) + 
+    geom_line(aes(y=wktickth/120, color="Audience per Screen"), linetype="dashed") +
+    geom_point(aes(y=wktickth/120, color="Audience per Screen")) +
+    scale_x_continuous(name="Week in Theatre", breaks=c(1:6)) +
+    scale_y_continuous(name = "Average Daily Audience (1.000.000s)", breaks = seq(0,3,0.5),
+                       sec.axis = sec_axis(~ . *120, name="Average Daily Audience per Screen", breaks = seq(50,400,50))) +
+    scale_color_manual(name="",values = c("blue","red")) +
+    theme_bw() +
+    theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
+    labs(title="A. by Weekend Release")
+```
+
+```{r,fig.width=7, fig.height=14, warning=FALSE}
+library(gridExtra)
+grid.arrange(plot1_panelA,plot1_panelB, nrow=2)
+```
+
+
+```{r, warning=FALSE}
+# FIGURE 2
+
+dat <- read.dta13("./data/res_dat/for_analyses.dta")
+
+dat_filtered <- filter(dat, wk1==1)
+
+dat_new <- dat_filtered %>% select(open_res_own_mat5_60_0, open_res_own_mat5_65_0, open_res_own_mat5_70_0, open_res_own_mat5_75_0, open_res_own_mat5_80_0, open_res_own_mat5_85_0, open_res_own_mat5_90_0, tickets_wk1d_r)
+
+#calculate z-scores
+dat_add_zscores <- dat_new %>% mutate(z_tickets_wk1d_r= zscore(tickets_wk1d_r))
+
+#FIGURE 2 PANEL A
+reg_60_0 <- lm_robust(tickets_wk1d_r ~ open_res_own_mat5_60_0, dat_add_zscores)
+
+reg_65_0 <- lm_robust(tickets_wk1d_r ~ open_res_own_mat5_65_0, dat_add_zscores)
+
+reg_70_0 <- lm_robust(tickets_wk1d_r ~ open_res_own_mat5_70_0, dat_add_zscores)
+
+reg_75_0 <- lm_robust(tickets_wk1d_r ~ open_res_own_mat5_75_0, dat_add_zscores)
+
+reg_80_0 <- lm_robust(tickets_wk1d_r ~ open_res_own_mat5_80_0, dat_add_zscores)
+
+reg_85_0 <- lm_robust(tickets_wk1d_r ~ open_res_own_mat5_85_0, dat_add_zscores)
+
+reg_90_0 <- lm_robust(tickets_wk1d_r ~ open_res_own_mat5_90_0, dat_add_zscores)
+
+data_60 <- broom::tidy(reg_60_0, conf.int = TRUE)
+data_65 <- broom::tidy(reg_65_0, conf.int = TRUE)
+data_70 <- broom::tidy(reg_70_0, conf.int = TRUE)
+data_75 <- broom::tidy(reg_75_0, conf.int = TRUE)
+data_80 <- broom::tidy(reg_80_0, conf.int = TRUE)
+data_85 <- broom::tidy(reg_85_0, conf.int = TRUE)
+data_90 <- broom::tidy(reg_90_0, conf.int = TRUE)
+
+data <- rbind(data_60, data_65, data_70, data_75, data_80, data_85, data_90)
+
+plot2_panelA <- data %>% 
+    # Remove intercept
+    filter(!term %in% '(Intercept)') %>% 
+    ggplot() +
+    # add line at null of 0
+    geom_hline(yintercept = 0, lty = 2) +
+    # add error bars for confidence interval
+    geom_segment(aes(x = term, xend = term,
+                     y = conf.low, yend = conf.high), colour = "black", size = 0.75) +
+    # add points for the coefficient estimates
+    geom_point(aes(x=term, y=estimate),
+               fill = "black", color = "black", shape = 21, 
+               size = 2, stroke = 1) +
+    labs(y = "Residual Opening Daily Ticket Sales (1,000,000s)", x = "Residual Temperature Range (Degree F, levels)", title="A. in Levels") +
+    scale_x_discrete(labels=c("60-65","65-70","70-75","75-80","80-85","85-90","90-95")) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r, warning=FALSE}
+# FIGURE 2 PNALE B
+z_reg_60_0 <- lm_robust(z_tickets_wk1d_r ~ zscore(open_res_own_mat5_60_0), dat_add_zscores)
+
+z_reg_65_0 <- lm_robust(z_tickets_wk1d_r ~ zscore(open_res_own_mat5_65_0), dat_add_zscores)
+
+z_reg_70_0 <- lm_robust(z_tickets_wk1d_r ~ zscore(open_res_own_mat5_70_0), dat_add_zscores)
+
+z_reg_75_0 <- lm_robust(z_tickets_wk1d_r ~ zscore(open_res_own_mat5_75_0), dat_add_zscores)
+
+z_reg_80_0 <- lm_robust(z_tickets_wk1d_r ~ zscore(open_res_own_mat5_80_0), dat_add_zscores)
+
+z_reg_85_0 <- lm_robust(z_tickets_wk1d_r ~ zscore(open_res_own_mat5_85_0), dat_add_zscores)
+
+z_reg_90_0 <- lm_robust(z_tickets_wk1d_r ~ zscore(open_res_own_mat5_90_0), dat_add_zscores)
+
+z_data_60 <- broom::tidy(z_reg_60_0, conf.int = TRUE)
+z_data_65 <- broom::tidy(z_reg_65_0, conf.int = TRUE)
+z_data_70 <- broom::tidy(z_reg_70_0, conf.int = TRUE)
+z_data_75 <- broom::tidy(z_reg_75_0, conf.int = TRUE)
+z_data_80 <- broom::tidy(z_reg_80_0, conf.int = TRUE)
+z_data_85 <- broom::tidy(z_reg_85_0, conf.int = TRUE)
+z_data_90 <- broom::tidy(z_reg_90_0, conf.int = TRUE)
+
+z_data <- rbind(z_data_60, z_data_65, z_data_70, z_data_75, z_data_80, z_data_85, z_data_90)
+
+plot2_panelB <- z_data %>% 
+    # Remove intercept
+    filter(!term %in% '(Intercept)') %>% 
+    ggplot() +
+    # add line at null of 0
+    geom_hline(yintercept = 0, lty = 2) +
+    # add error bars for confidence interval
+    geom_segment(aes(x = term, xend = term,
+                     y = conf.low, yend = conf.high), colour = "black", size = 0.75) +
+    # add points for the coefficient estimates
+    geom_point(aes(x=term, y=estimate),
+               fill = "black", color = "black", shape = 21, 
+               size = 2, stroke = 1) +
+    labs(y = "Residual Opening Daily Ticket Sales", x = "Residual Temperature Range (Degree F, Z-score)", title="B. in Z-scores") +
+    scale_x_discrete(labels=c("60-65","65-70","70-75","75-80","80-85","85-90","90-95")) +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r,fig.width=7, fig.height=14, warning=FALSE}
+library(gridExtra)
+grid.arrange(plot2_panelA,plot2_panelB, nrow=2)
+```
+
+
+```{r,fig.width=7, fig.height=6, warning=FALSE}
+# FIGURE 3
+
+dat <- read.dta13("./data/res_dat/for_analyses.dta")
+
+ggplot(dat, aes(open_res_own_mat5_75_0)) +
+  geom_histogram(aes(y = ..density..), bins=50, color="black", fill="grey") +
+  labs(x="Residual % Theaters at 75-80 Degrees F In Opening Weekend", y="Density") +
+  theme_bw()
+
+```
+
+
+```{r,fig.width=7, fig.height=6, warning=FALSE}
+# FIGURE 4
+
+source("binscatter.R")
+
+dat <- read.dta13("./data/res_dat/for_analyses.dta")
+
+dat <- filter(dat, wk1==1)
+
+tickets_wk1d_r <- dat$tickets
+selected <- dat$open_res_own_mat5_75_0 * 100 
+
+
+plot4 <- binscatter('tickets_wk1d_r ~ selected', data=dat, key_var = 'selected', bins=100, xlabname="Residual % Theaters at 75-80 degrees",
+                    ylabname="Residual Ticket Sales (1,000,000s)", titletext = "Week 1")
+
+plot4
+```
+
+
+```{r, warning=FALSE}
+# FIGURE 5
+dat <- read.dta13("./data/res_dat/for_analyses.dta")
+
+#create vector with variable names of regression
+dow_<- dat %>%  
+  select(grep("dow_", names(dat), value=TRUE))
+
+ww <- dat %>%  
+  select(grep("ww", names(dat), value=TRUE))
+
+yy <- dat %>%  
+  select(grep("yy", names(dat), value=TRUE))
+
+h<- dat %>%  
+  select(tidyselect::vars_select(names(dat), starts_with('h', ignore.case = TRUE)))
+
+selected_ownweather<- dat %>%  
+  select(own_mat10_10, own_mat10_20, own_mat10_30, own_mat10_40, own_mat10_50, own_mat10_60, own_mat10_70, own_mat10_80, own_mat10_90, own_snow, own_rain, own_prec_0, own_prec_1, own_prec_2, own_prec_3, own_prec_4, own_prec_5)
+#merge regression variables
+regression_variables <- cbind(selected_ownweather, dow_, ww, yy, h)
+
+#_____________________________________________________________________
+#                           Week 2
+#_____________________________________________________________________
+
+#create data frame for week2
+dat_week2 <- filter(dat, wk2==1)
+
+selected <- dat_week2$open_res_own_mat5_75_0
+tickets_wk2d_r <- dat_week2$tickets
+
+#create regression formula as string
+f <- paste("tickets_wk2d_r", "~", paste(colnames(regression_variables), collapse=" + "))
+
+plot5_week2 <- binscatter(f, data=dat_week2, key_var = 'selected', bins=100, titletext = "Week 2", ylimit=c(-.5,.5), xlimit=c(-.1,.2))
+
+#_____________________________________________________________________
+#                           Week 3
+#_____________________________________________________________________
+
+#create data frame for week3
+dat_week3 <- filter(dat, wk3==1)
+
+selected <- dat_week2$open_res_own_mat5_75_0
+tickets_wk3d_r <- dat_week3$tickets
+
+#create regression formula as string
+f <- paste("tickets_wk3d_r", "~", paste(colnames(regression_variables), collapse=" + "))
+
+plot5_week3 <- binscatter(f, data=dat_week3, key_var = 'selected', bins=100, titletext = "Week 3", ylimit=c(-.4,.4), xlimit=c(-.1,.2))
+
+#_____________________________________________________________________
+#                           Week 4
+#_____________________________________________________________________
+
+#create data frame for week4
+dat_week4 <- filter(dat, wk4==1)
+
+selected <- dat_week4$open_res_own_mat5_75_0
+tickets_wk4d_r <- dat_week4$tickets
+
+#create regression formula as string
+f <- paste("tickets_wk4d_r", "~", paste(colnames(regression_variables), collapse=" + "))
+
+plot5_week4 <- binscatter(f, data=dat_week4, key_var = 'selected', bins=100, titletext = "Week 4", ylimit=c(-.2,.4), xlimit=c(-.1,.2))
+
+#_____________________________________________________________________
+#                           Week 5
+#_____________________________________________________________________
+
+#create data frame for week5
+dat_week5 <- filter(dat, wk5==1)
+
+selected <- dat_week5$open_res_own_mat5_75_0
+tickets_wk5d_r <- dat_week5$tickets
+
+#create regression formula as string
+f <- paste("tickets_wk5d_r", "~", paste(colnames(regression_variables), collapse=" + "))
+
+plot5_week5 <- binscatter(f, data=dat_week5, key_var = 'selected', bins=100, titletext = "Week 5", ylimit=c(-.2,.3), xlimit=c(-.1,.2))
+
+#_____________________________________________________________________
+#                           Week 6
+#_____________________________________________________________________
+
+#create data frame for week6
+dat_week6 <- filter(dat, wk6==1)
+
+selected <- dat_week6$open_res_own_mat5_75_0
+tickets_wk6d_r <- dat_week6$tickets
+
+selected_ownweather<- dat_week6 %>%  
+  select(own_mat10_10, own_mat10_20, own_mat10_30, own_mat10_40, own_mat10_50, own_mat10_60, own_mat10_70, own_mat10_80, own_mat10_90, own_snow, own_rain, own_prec_0, own_prec_1, own_prec_2, own_prec_3, own_prec_4, own_prec_5)
+#merge regression variables
+temp <- cbind(selected_ownweather, dow_, ww, yy, h)
+#create regression formula as string
+f <- paste("tickets_wk6d_r", "~", paste(colnames(regression_variables), collapse=" + "))
+
+plot5_week6 <- binscatter(f, data=dat_week6, key_var = 'selected', bins=100, titletext = "Week 6", ylimit=c(-.1,.2), xlimit=c(-.1,.2))
+
+#_____________________________________________________________________
+#                           Week 2-6
+#_____________________________________________________________________
+
+#create data frame for Weeks 2-6
+dat_week2to6 <- filter(dat, !wk1==1)
+
+selected <- dat_week2to6$open_res_own_mat5_75_0
+tickets_wknd_r <- dat_week2to6$tickets
+
+#create regression formula as string
+f <- paste("tickets_wknd_r", "~", paste(colnames(regression_variables), collapse=" + "))
+
+plot5_week2to6 <- binscatter(f, data=dat_week2to6, key_var = 'selected', bins=100, titletext = "Week 2 to 6", ylimit=c(-.5,.5), xlimit=c(-.1,.2))
+
+```
+
+
+
+```{r,fig.width=14, fig.height=9, warning=FALSE}
+library(gridExtra)
+grid.arrange(plot5_week2,plot5_week3,plot5_week4,plot5_week5,plot5_week6,plot5_week2to6, nrow=2, ncol=3, bottom="Residual % Theaters at 75-80 degrees F on Opening Weekends", left="Residual Ticket Sales (1,000,000s)")
+```
+
